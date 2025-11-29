@@ -16,42 +16,46 @@ export default function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-4">
+    <header className="bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+          className="lg:hidden p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg flex-shrink-0"
           aria-label="Open menu"
         >
-          <Menu className="w-6 h-6" />
+          <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
-        <div className="flex items-center gap-2">
-          <img src="/logo-icon.svg" alt="INVO Maker" className="w-8 h-8 hidden md:block" />
-          <h1 className="text-xl font-bold text-gray-900">INVO Maker</h1>
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+          <img src="/logo-icon.svg" alt="INVO Maker" className="w-7 h-7 sm:w-8 sm:h-8 flex-shrink-0" />
+          <h1 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 truncate">
+            <span className="hidden sm:inline">INVO Maker</span>
+            <span className="sm:hidden">INVO</span>
+          </h1>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
         <button
-          className="p-2 hover:bg-gray-100 rounded-lg relative"
+          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg relative flex-shrink-0"
           aria-label="Notifications"
         >
-          <Bell className="w-5 h-5" />
+          <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
         </button>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-            <User className="w-4 h-4 text-white" />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
           </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="hidden sm:block">
+            <p className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[100px] md:max-w-none">
               {user?.email?.split('@')[0]}
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="text-sm text-gray-600 hover:text-gray-900 ml-2"
+            className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
           >
-            Sign Out
+            <span className="hidden sm:inline">Sign Out</span>
+            <span className="sm:hidden">Out</span>
           </button>
         </div>
       </div>
