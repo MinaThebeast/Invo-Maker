@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSubscription } from '../hooks/useSubscription';
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '../services/subscriptionService';
 import { useAuth } from '../hooks/useAuth';
@@ -246,7 +246,7 @@ export default function Billing() {
                     onClick={() => handleSubscribe(subscriptionPlan)}
                     disabled={isCurrentPlan || isProcessing}
                     className="w-full"
-                    variant={isCurrentPlan ? 'outline' : 'default'}
+                    variant={isCurrentPlan ? 'outline' : 'primary'}
                   >
                     {isProcessing ? (
                       <>

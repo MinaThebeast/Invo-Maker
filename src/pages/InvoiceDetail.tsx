@@ -22,7 +22,7 @@ export default function InvoiceDetail() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [downloadingPDF, setDownloadingPDF] = useState(false);
-  const [sendingEmail, setSendingEmail] = useState(false);
+  const [_sendingEmail, setSendingEmail] = useState(false);
   const [sendingSMS, setSendingSMS] = useState(false);
   const [sendingReminder, setSendingReminder] = useState(false);
 
@@ -30,7 +30,7 @@ export default function InvoiceDetail() {
     if (!invoice) return;
     setDownloadingPDF(true);
     try {
-      await downloadInvoicePDF(invoice, business, invoice.customer || undefined);
+      await downloadInvoicePDF(invoice, business, invoice.customer || null);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF');

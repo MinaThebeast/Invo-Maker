@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import { getCustomerInfo } from '../lib/revenuecat';
-import { useAuth } from '../hooks/useAuth';
+// import { useAuth } from '../hooks/useAuth'; // Unused
 
 export type SubscriptionTier = 'free' | 'pro' | 'gold';
 

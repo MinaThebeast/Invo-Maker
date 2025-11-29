@@ -15,28 +15,28 @@ export async function generateInvoicePDF(
   const contentWidth = pageWidth - margin * 2;
   let yPos = margin;
 
-  // Helper function to add text with word wrap
-  const addText = (text: string, x: number, y: number, maxWidth?: number, fontSize = 10) => {
-    doc.setFontSize(fontSize);
-    if (maxWidth) {
-      const lines = doc.splitTextToSize(text, maxWidth);
-      doc.text(lines, x, y);
-      return lines.length * (fontSize * 0.4);
-    } else {
-      doc.text(text, x, y);
-      return fontSize * 0.4;
-    }
-  };
+  // Helper function to add text with word wrap (unused)
+  // const addText = (text: string, x: number, y: number, maxWidth?: number, fontSize = 10) => {
+  //   doc.setFontSize(fontSize);
+  //   if (maxWidth) {
+  //     const lines = doc.splitTextToSize(text, maxWidth);
+  //     doc.text(lines, x, y);
+  //     return lines.length * (fontSize * 0.4);
+  //   } else {
+  //     doc.text(text, x, y);
+  //     return fontSize * 0.4;
+  //   }
+  // };
 
   // Header - Business Info
   if (business) {
     doc.setFontSize(20);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text(business.name, margin, yPos);
     yPos += 10;
 
     doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     const businessInfo: string[] = [];
     if (business.address) businessInfo.push(business.address);
     if (business.city) businessInfo.push(business.city);
@@ -58,13 +58,13 @@ export async function generateInvoicePDF(
 
   // Invoice Title
   doc.setFontSize(18);
-  doc.setFont(undefined, 'bold');
+  doc.setFont('helvetica', 'bold');
   doc.text('INVOICE', margin, yPos);
   yPos += 10;
 
   // Invoice Number and Dates
   doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
+  doc.setFont('helvetica', 'normal');
   doc.text(`Invoice #: ${invoice.invoice_number}`, margin, yPos);
   doc.text(
     `Date: ${new Date(invoice.issue_date).toLocaleDateString()}`,
@@ -82,12 +82,12 @@ export async function generateInvoicePDF(
   // Customer Info
   if (customer) {
     doc.setFontSize(12);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Bill To:', margin, yPos);
     yPos += 7;
 
     doc.setFontSize(10);
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     doc.text(customer.name, margin, yPos);
     yPos += 5;
 
@@ -111,7 +111,7 @@ export async function generateInvoicePDF(
   yPos += 10;
 
   // Items Table
-  const tableTop = yPos;
+  // const tableTop = yPos; // Unused
   const colWidths = {
     item: contentWidth * 0.4,
     qty: contentWidth * 0.15,
@@ -121,7 +121,7 @@ export async function generateInvoicePDF(
 
   // Table Header
   doc.setFontSize(10);
-  doc.setFont(undefined, 'bold');
+  doc.setFont('helvetica', 'bold');
   doc.text('Item', margin, yPos);
   doc.text('Qty', margin + colWidths.item, yPos);
   doc.text('Price', margin + colWidths.item + colWidths.qty, yPos);
@@ -134,7 +134,7 @@ export async function generateInvoicePDF(
   yPos += 5;
 
   // Table Rows
-  doc.setFont(undefined, 'normal');
+  doc.setFont('helvetica', 'normal');
   if (invoice.items && invoice.items.length > 0) {
     invoice.items.forEach((item) => {
       // Check if we need a new page
@@ -180,7 +180,7 @@ export async function generateInvoicePDF(
     yPos += 6;
   }
 
-  doc.setFont(undefined, 'bold');
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.text('Total:', totalsX, yPos);
   doc.text(`$${invoice.total.toFixed(2)}`, pageWidth - margin - colWidths.total, yPos, {
@@ -188,7 +188,7 @@ export async function generateInvoicePDF(
   });
   yPos += 8;
 
-  doc.setFont(undefined, 'normal');
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   if (invoice.paid_amount > 0) {
     doc.text('Paid:', totalsX, yPos);
@@ -199,7 +199,7 @@ export async function generateInvoicePDF(
   }
 
   if (invoice.balance > 0) {
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Balance Due:', totalsX, yPos);
     doc.text(`$${invoice.balance.toFixed(2)}`, pageWidth - margin - colWidths.total, yPos, {
       align: 'right',
@@ -211,10 +211,10 @@ export async function generateInvoicePDF(
   // Notes and Terms
   if (invoice.notes) {
     doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Notes:', margin, yPos);
     yPos += 6;
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     const notesLines = doc.splitTextToSize(invoice.notes, contentWidth);
     notesLines.forEach((line: string) => {
       if (yPos > doc.internal.pageSize.getHeight() - 20) {
@@ -229,10 +229,10 @@ export async function generateInvoicePDF(
 
   if (invoice.terms) {
     doc.setFontSize(10);
-    doc.setFont(undefined, 'bold');
+    doc.setFont('helvetica', 'bold');
     doc.text('Terms:', margin, yPos);
     yPos += 6;
-    doc.setFont(undefined, 'normal');
+    doc.setFont('helvetica', 'normal');
     const termsLines = doc.splitTextToSize(invoice.terms, contentWidth);
     termsLines.forEach((line: string) => {
       if (yPos > doc.internal.pageSize.getHeight() - 20) {

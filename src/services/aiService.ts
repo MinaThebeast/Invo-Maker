@@ -4,10 +4,11 @@
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-interface AIResponse {
-  content: string;
-  structured?: any;
-}
+// Unused interface - commented out
+// interface AIResponse {
+//   content: string;
+//   structured?: any;
+// }
 
 /**
  * Call OpenAI API

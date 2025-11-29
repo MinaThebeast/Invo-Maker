@@ -51,7 +51,7 @@ export default function BarcodeScanner({
           stopScanner();
           onClose();
         },
-        (errorMessage) => {
+        (_errorMessage) => {
           // Scan error (ignore, it's normal during scanning)
         }
       );

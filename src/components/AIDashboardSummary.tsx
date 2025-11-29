@@ -22,7 +22,7 @@ export default function AIDashboardSummary({
   const [summary, setSummary] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const hasCheckedRef = useRef(false);
+  // const hasCheckedRef = useRef(false); // Unused
   const lastInvoiceCountRef = useRef<number | null>(null);
   const { checkAction, trackUsage } = useSubscription();
   const navigate = useNavigate();

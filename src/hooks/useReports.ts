@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import * as reportsService from '../services/reportsService';
-import { Invoice } from '../types';
+// import { Invoice } from '../types'; // Unused
 
 export function useReports() {
   const [loading, setLoading] = useState(false);

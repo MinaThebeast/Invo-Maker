@@ -93,8 +93,8 @@ export async function checkSubscriptionStatus(userId: string): Promise<boolean> 
  * Note: This requires backend implementation or RevenueCat web SDK
  */
 export async function createCheckoutSession(
-  userId: string,
-  productId: string
+  _userId: string,
+  _productId: string
 ): Promise<string> {
   if (!revenueCatConfig) {
     throw new Error('RevenueCat not configured');

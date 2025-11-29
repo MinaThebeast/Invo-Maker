@@ -8,7 +8,7 @@ import { useBusiness } from '../hooks/useBusiness';
 import { useSubscription } from '../hooks/useSubscription';
 import { Invoice, InvoiceItem } from '../types';
 import Button from '../components/ui/Button';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+// import LoadingSpinner from '../components/ui/LoadingSpinner'; // Unused
 import { useToast, ToastContainer } from '../components/ui/ToastContainer';
 import BarcodeScanner from '../components/BarcodeScanner';
 import OCRScanner from '../components/OCRScanner';

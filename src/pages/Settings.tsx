@@ -113,6 +113,7 @@ export default function Settings() {
       if (isNewBusiness) {
         // Create new business
         const created = await businessService.createBusiness({
+          user_id: user!.id,
           name: business.name || 'My Business',
           email: business.email || user?.email || '',
           phone: business.phone,

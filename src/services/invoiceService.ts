@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Invoice, InvoiceItem, Customer, Product } from '../types';
+import { Invoice, InvoiceItem } from '../types';
 import { decreaseStock } from './inventoryService';
 
 /**
@@ -500,13 +500,11 @@ export async function duplicateInvoice(id: string): Promise<Invoice> {
 
     if (!business) throw new Error('Business not found');
 
-    // Generate new invoice number
-    const { count } = await supabase
-      .from('invoices')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id);
-
-    const invoiceNumber = `${business.invoice_prefix}-${String((count || 0) + 1).padStart(4, '0')}`;
+    // Generate new invoice number (unused - invoice number is generated in createInvoice)
+    // const { count } = await supabase
+    //   .from('invoices')
+    //   .select('*', { count: 'exact', head: true })
+    //   .eq('business_id', business.id);
 
     // Create new invoice with same data
     const newInvoice = await createInvoice({

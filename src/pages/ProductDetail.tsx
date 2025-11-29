@@ -12,7 +12,7 @@ export default function ProductDetail() {
   const { product, loading } = useProduct(id);
   const { deleteProduct } = useProducts();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [_deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!id) return;

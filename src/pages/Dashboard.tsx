@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Package, FileText, DollarSign, Sparkles } from 'lucide-react';
 import { useReports } from '../hooks/useReports';
 import { useInvoices } from '../hooks/useInvoices';
-import { useCustomers } from '../hooks/useCustomers';
-import { useProducts } from '../hooks/useProducts';
+// Removed unused imports: useCustomers, useProducts
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import AIQuickInvoice from '../components/AIQuickInvoice';
 import AIDashboardSummary from '../components/AIDashboardSummary';
@@ -22,11 +21,13 @@ export default function Dashboard() {
   const [previousMonthStats, setPreviousMonthStats] = useState<{
     total_invoiced: number;
     total_paid: number;
+    total_outstanding: number;
+    invoice_count: number;
+    paid_count: number;
+    overdue_count: number;
   }>();
   const { loading, getTotals } = useReports();
   const { invoices } = useInvoices();
-  const { customers } = useCustomers();
-  const { products } = useProducts();
   const navigate = useNavigate();
   const [showAIQuickInvoice, setShowAIQuickInvoice] = useState(false);
 
@@ -46,6 +47,10 @@ export default function Dashboard() {
         setPreviousMonthStats({
           total_invoiced: prevTotals.total_invoiced,
           total_paid: prevTotals.total_paid,
+          total_outstanding: prevTotals.total_outstanding || 0,
+          invoice_count: prevTotals.invoice_count || 0,
+          paid_count: prevTotals.paid_count || 0,
+          overdue_count: prevTotals.overdue_count || 0,
         });
       } catch (error) {
         console.error('Error loading stats:', error);

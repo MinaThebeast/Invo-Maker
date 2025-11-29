@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import { useCustomer, useCustomers } from '../hooks/useCustomers';
-import { useInvoices } from '../hooks/useInvoices';
+// import { useInvoices } from '../hooks/useInvoices'; // Unused
 import Button from '../components/ui/Button';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
@@ -15,7 +15,7 @@ export default function CustomerDetail() {
   const { customer, invoices, loading } = useCustomer(id);
   const { deleteCustomer } = useCustomers();
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [deleting, setDeleting] = useState(false);
+  const [_deleting, setDeleting] = useState(false);
 
   const handleDelete = async () => {
     if (!id) return;
