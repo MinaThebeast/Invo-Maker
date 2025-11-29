@@ -4,7 +4,7 @@ import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '../../services/subscriptio
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../ui/Button';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { Check, Crown, Zap, Sparkles, CreditCard, AlertCircle } from 'lucide-react';
+import { Check, Crown, Zap, Sparkles, CreditCard, AlertCircle, Smartphone, AppWindow } from 'lucide-react';
 import { useToast, ToastContainer } from '../ui/ToastContainer';
 
 export default function SubscriptionTab() {
@@ -25,23 +25,17 @@ export default function SubscriptionTab() {
       return;
     }
 
-    setProcessing(selectedPlan.tier);
-
-    try {
-      const { createCheckoutSession } = await import('../../lib/revenuecat');
-      
-      const { url } = await createCheckoutSession(
-        user.id,
-        selectedPlan.priceId,
-        user.email || ''
-      );
-
-      // Redirect to Stripe Checkout
-      window.location.href = url;
-    } catch (err: any) {
-      console.error('Checkout error:', err);
-      showError(err.message || 'Failed to create checkout session. Please ensure RevenueCat and Stripe are configured.');
-      setProcessing(null);
+    // For native mobile apps, subscriptions are managed through App Store/Play Store
+    // This is handled by the RevenueCat SDK in the native app
+    const { Capacitor } = await import('@capacitor/core');
+    
+    if (Capacitor.isNativePlatform()) {
+      // In native app, RevenueCat SDK handles the purchase flow
+      // This will be implemented in the native iOS/Android code
+      showError('Subscription management is handled through the App Store or Play Store. Please use the native app to subscribe.');
+    } else {
+      // Web version - show message that subscriptions are mobile-only
+      showError('Subscriptions are available through the mobile app only. Please download the iOS or Android app to subscribe.');
     }
   };
 
@@ -248,14 +242,26 @@ export default function SubscriptionTab() {
                       'Switch to Free'
                     ) : (
                       <>
-                        <CreditCard className="w-4 h-4 mr-2" />
-                        Subscribe
+                        <Smartphone className="w-4 h-4 mr-2" />
+                        Subscribe in App
                       </>
                     )}
                   </Button>
                 </div>
               );
             })}
+          </div>
+        </div>
+
+        {/* Native App Subscription Notice */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+          <Smartphone className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-semibold text-blue-900 mb-1">Native App Subscriptions</h4>
+            <p className="text-sm text-blue-800">
+              Subscriptions are managed through the Apple App Store (iOS) or Google Play Store (Android).
+              Download the mobile app to subscribe to Pro or Gold plans. Your subscription will sync across all platforms.
+            </p>
           </div>
         </div>
 
@@ -266,9 +272,9 @@ export default function SubscriptionTab() {
             <div>
               <h4 className="font-semibold text-amber-900 mb-1">RevenueCat Not Configured</h4>
               <p className="text-sm text-amber-800">
-                To enable subscriptions, configure RevenueCat in your environment variables.
+                To enable subscription status checking, configure RevenueCat in your environment variables.
                 Add <code className="bg-amber-100 px-1 rounded">VITE_REVENUECAT_API_KEY</code> to
-                your .env file.
+                your .env file. This is optional for web but required for native apps.
               </p>
             </div>
           </div>

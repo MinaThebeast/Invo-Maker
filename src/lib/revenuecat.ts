@@ -88,38 +88,11 @@ export async function checkSubscriptionStatus(userId: string): Promise<boolean> 
   }
 }
 
-import { supabase } from './supabase';
-
 /**
- * Create a checkout session for a subscription
- * Uses Supabase Edge Function to create Stripe checkout session
+ * Note: For native mobile apps, subscriptions are handled by RevenueCat SDK
+ * through Apple App Store and Google Play Store.
+ * 
+ * This file only provides REST API access to check subscription status.
+ * The actual purchase flow is handled in the native iOS/Android code.
  */
-export async function createCheckoutSession(
-  userId: string,
-  planId: string,
-  userEmail: string
-): Promise<{ url: string; sessionId: string }> {
-  const successUrl = `${window.location.origin}/settings?subscription=success&plan=${planId}`;
-  const cancelUrl = `${window.location.origin}/settings?subscription=cancelled`;
-
-  const { data, error } = await supabase.functions.invoke('create-checkout', {
-    body: {
-      userId,
-      planId,
-      userEmail,
-      successUrl,
-      cancelUrl,
-    },
-  });
-
-  if (error) {
-    throw new Error(error.message || 'Failed to create checkout session');
-  }
-
-  if (!data?.url) {
-    throw new Error('No checkout URL returned');
-  }
-
-  return { url: data.url, sessionId: data.sessionId };
-}
 
