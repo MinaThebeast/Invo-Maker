@@ -7,19 +7,37 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cap:add": "npx cap add",
+    "cap:sync": "npx cap sync",
+    "cap:open": "npx cap open",
+    "cap:copy": "npx cap copy",
+    "cap:run": "npx cap run",
+    "cap:ios": "npx cap open ios",
+    "cap:android": "npx cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^7.4.4",
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/camera": "^7.0.2",
+    "@capacitor/cli": "^7.4.4",
+    "@capacitor/core": "^7.4.4",
+    "@capacitor/filesystem": "^7.1.5",
+    "@capacitor/haptics": "^7.0.2",
+    "@capacitor/ios": "^7.4.4",
+    "@capacitor/network": "^7.0.2",
+    "@capacitor/splash-screen": "^7.0.3",
+    "@capacitor/status-bar": "^7.0.3",
+    "@supabase/supabase-js": "^2.38.4",
+    "clsx": "^2.0.0",
+    "date-fns": "^2.30.0",
+    "html5-qrcode": "^2.3.8",
+    "jspdf": "^2.5.1",
+    "lucide-react": "^0.294.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0",
-    "@supabase/supabase-js": "^2.38.4",
-    "lucide-react": "^0.294.0",
-    "date-fns": "^2.30.0",
-    "clsx": "^2.0.0",
-    "tailwind-merge": "^2.1.0",
-    "jspdf": "^2.5.1",
-    "html5-qrcode": "^2.3.8"
+    "tailwind-merge": "^2.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -37,4 +55,3 @@
     "vite": "^5.0.8"
   }
 }
-
