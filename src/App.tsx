@@ -35,7 +35,10 @@ function App() {
         }
       } catch (error) {
         // StatusBar plugin not available (web environment)
-        // Silently fail in web environment
+        // Silently fail in web environment - don't log undefined errors
+        if (error && import.meta.env.DEV) {
+          console.debug('StatusBar initialization skipped (web environment)');
+        }
       }
     };
     initStatusBar();
