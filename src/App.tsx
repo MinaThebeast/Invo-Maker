@@ -1,4 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -20,6 +22,24 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 
 function App() {
   const { user, loading } = useAuth();
+
+  // Initialize StatusBar for mobile
+  useEffect(() => {
+    const initStatusBar = async () => {
+      try {
+        // Check if Capacitor is available (native platform)
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.isNativePlatform()) {
+          await StatusBar.setStyle({ style: Style.Light });
+          await StatusBar.setBackgroundColor({ color: '#ffffff' });
+        }
+      } catch (error) {
+        // StatusBar plugin not available (web environment)
+        // Silently fail in web environment
+      }
+    };
+    initStatusBar();
+  }, []);
 
   if (loading) {
     return (

@@ -26,6 +26,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  
 }
 
 @layer utilities {
@@ -35,6 +36,31 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+  
+  /* Safe area utilities for mobile */
+  .safe-area-top {
+    /* Use env() with fallback - iOS safe area + base padding */
+    padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+  }
+  
+  /* For Android and devices without safe area, add minimum status bar height */
+  @supports (padding: env(safe-area-inset-top)) {
+    .safe-area-top {
+      padding-top: calc(env(safe-area-inset-top) + 0.5rem);
+    }
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+  
+  .safe-area-left {
+    padding-left: max(env(safe-area-inset-left), 0px);
+  }
+  
+  .safe-area-right {
+    padding-right: max(env(safe-area-inset-right), 0px);
   }
 }
 
