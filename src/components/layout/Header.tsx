@@ -25,7 +25,10 @@ export default function Header({ onMenuClick }: HeaderProps) {
         >
           <Menu className="w-6 h-6" />
         </button>
-        <h1 className="text-xl font-bold text-gray-900">INVO Maker</h1>
+        <div className="flex items-center gap-2">
+          <img src="/logo-icon.svg" alt="INVO Maker" className="w-8 h-8 hidden md:block" />
+          <h1 className="text-xl font-bold text-gray-900">INVO Maker</h1>
+        </div>
       </div>
 
       <div className="flex items-center gap-3">

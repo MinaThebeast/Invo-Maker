@@ -1,0 +1,32 @@
+<svg width="200" height="60" viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Logo with Text -->
+  <g>
+    <!-- Icon Part -->
+    <g transform="translate(0, 10)">
+      <rect width="40" height="40" rx="8" fill="url(#gradient)"/>
+      <g transform="translate(8, 6)">
+        <rect x="0" y="0" width="24" height="28" rx="1" fill="white" opacity="0.95"/>
+        <line x1="3" y1="5" x2="21" y2="5" stroke="#3B82F6" stroke-width="1" stroke-linecap="round"/>
+        <line x1="3" y1="10" x2="18" y2="10" stroke="#9CA3AF" stroke-width="0.8" stroke-linecap="round"/>
+        <line x1="3" y1="15" x2="19" y2="15" stroke="#9CA3AF" stroke-width="0.8" stroke-linecap="round"/>
+        <line x1="3" y1="20" x2="21" y2="20" stroke="#10B981" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="12" cy="25" r="2.5" fill="#3B82F6"/>
+        <text x="12" y="26.5" font-family="Arial, sans-serif" font-size="3" font-weight="bold" fill="white" text-anchor="middle">$</text>
+      </g>
+    </g>
+    
+    <!-- Text Part -->
+    <g transform="translate(50, 0)">
+      <text x="0" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#1F2937">INVO</text>
+      <text x="70" y="25" font-family="Arial, sans-serif" font-size="24" font-weight="300" fill="#6B7280">Maker</text>
+    </g>
+  </g>
+  
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
+

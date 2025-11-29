@@ -32,6 +32,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:border-gray-200 lg:bg-white">
         <div className="flex flex-col flex-1 pt-5 pb-4 overflow-y-auto">
+          {/* Logo */}
+          <div className="flex items-center justify-center px-4 mb-6">
+            <NavLink to="/dashboard" className="flex items-center space-x-2">
+              <img src="/logo-icon.svg" alt="INVO Maker" className="w-10 h-10" />
+              <div className="flex flex-col">
+                <span className="text-lg font-bold text-gray-900">INVO</span>
+                <span className="text-xs font-light text-gray-500 -mt-1">Maker</span>
+              </div>
+            </NavLink>
+          </div>
           <nav className="mt-5 flex-1 px-2 space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -71,7 +81,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Menu</h2>
+            <NavLink to="/dashboard" className="flex items-center space-x-2" onClick={onClose}>
+              <img src="/logo-icon.svg" alt="INVO Maker" className="w-8 h-8" />
+              <div className="flex flex-col">
+                <span className="text-base font-bold text-gray-900">INVO</span>
+                <span className="text-xs font-light text-gray-500 -mt-1">Maker</span>
+              </div>
+            </NavLink>
             <button
               onClick={onClose}
               className="p-2 hover:bg-gray-100 rounded-lg"
