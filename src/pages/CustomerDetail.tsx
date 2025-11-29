@@ -126,17 +126,14 @@ export default function CustomerDetail() {
       </div>
 
       {/* AI Customer Summary */}
-      <AICustomerSummary customer={customer} invoices={invoices} />
-
-      {/* AI Customer Summary */}
-      {customer && <AICustomerSummary customer={customer} invoices={customerInvoices} />}
+      {customer && invoices && <AICustomerSummary customer={customer} invoices={invoices} />}
 
       {/* Invoice History */}
       <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Invoice History
         </h2>
-        {customerInvoices.length === 0 ? (
+        {!invoices || invoices.length === 0 ? (
           <p className="text-gray-500 text-sm">No invoices yet.</p>
         ) : (
           <div className="overflow-x-auto">
@@ -161,7 +158,7 @@ export default function CustomerDetail() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {customerInvoices.map((invoice) => (
+                {invoices.map((invoice) => (
                   <tr
                     key={invoice.id}
                     className="hover:bg-gray-50 cursor-pointer"
