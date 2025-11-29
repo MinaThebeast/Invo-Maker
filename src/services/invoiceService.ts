@@ -5,10 +5,16 @@ import { decreaseStock } from './inventoryService';
 /**
  * Calculate invoice totals from items
  */
-function calculateTotals(items: Partial<InvoiceItem>[]): {
+function calculateTotals(
+  items: Partial<InvoiceItem>[],
+  shippingFee: number = 0,
+  extraFees: number = 0
+): {
   subtotal: number;
   taxTotal: number;
   discountTotal: number;
+  shippingFee: number;
+  extraFees: number;
   total: number;
 } {
   const subtotal = items.reduce(
@@ -24,9 +30,9 @@ function calculateTotals(items: Partial<InvoiceItem>[]): {
     return sum + itemTax;
   }, 0);
 
-  const total = subtotal - discountTotal + taxTotal;
+  const total = subtotal - discountTotal + taxTotal + (shippingFee || 0) + (extraFees || 0);
 
-  return { subtotal, taxTotal, discountTotal, total };
+  return { subtotal, taxTotal, discountTotal, shippingFee: shippingFee || 0, extraFees: extraFees || 0, total };
 }
 
 /**
@@ -150,6 +156,8 @@ export async function createInvoice(
     currency?: string;
     notes?: string;
     terms?: string;
+    shipping_fee?: number;
+    extra_fees?: number;
     items: Partial<InvoiceItem>[];
   }
 ): Promise<Invoice> {
@@ -162,24 +170,36 @@ export async function createInvoice(
 
     const { data: business } = await supabase
       .from('businesses')
-      .select('id, invoice_prefix')
+      .select('id, invoice_prefix, auto_numbering, next_invoice_number')
       .eq('user_id', user.id)
       .single();
 
     if (!business) throw new Error('Business not found');
 
     // Calculate totals
-    const { subtotal, taxTotal, discountTotal, total } = calculateTotals(
-      invoiceData.items
+    const { subtotal, taxTotal, discountTotal, shippingFee, extraFees, total } = calculateTotals(
+      invoiceData.items,
+      invoiceData.shipping_fee || 0,
+      invoiceData.extra_fees || 0
     );
 
     // Generate invoice number
-    const { count } = await supabase
-      .from('invoices')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id);
-
-    const invoiceNumber = `${business.invoice_prefix}-${String((count || 0) + 1).padStart(4, '0')}`;
+    let invoiceNumber: string;
+    if (business.auto_numbering && business.next_invoice_number) {
+      invoiceNumber = `${business.invoice_prefix || 'INV'}-${String(business.next_invoice_number).padStart(4, '0')}`;
+      // Update next invoice number
+      await supabase
+        .from('businesses')
+        .update({ next_invoice_number: business.next_invoice_number + 1 })
+        .eq('id', business.id);
+    } else {
+      // Fallback to count-based numbering
+      const { count } = await supabase
+        .from('invoices')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', business.id);
+      invoiceNumber = `${business.invoice_prefix || 'INV'}-${String((count || 0) + 1).padStart(4, '0')}`;
+    }
 
     // Create invoice
     const { data: invoice, error: invoiceError } = await supabase
@@ -195,6 +215,8 @@ export async function createInvoice(
         subtotal,
         tax_total: taxTotal,
         discount_total: discountTotal,
+        shipping_fee: shippingFee,
+        extra_fees: extraFees,
         total,
         paid_amount: 0,
         balance: total,
@@ -235,7 +257,7 @@ export async function createInvoice(
         if (itemsError) throw itemsError;
 
         // Decrease stock for products (only if invoice is not draft)
-        if (status !== 'draft') {
+        if (invoiceData.status !== 'draft') {
           for (const item of invoiceData.items) {
             if (item.product_id && item.quantity) {
               try {
@@ -270,22 +292,29 @@ export async function updateInvoice(
     currency?: string;
     notes?: string;
     terms?: string;
+    shipping_fee?: number;
+    extra_fees?: number;
     items?: Partial<InvoiceItem>[];
   }
 ): Promise<Invoice> {
   try {
+    // Get current invoice to preserve shipping_fee and extra_fees if not provided
+    const { data: currentInvoice } = await supabase
+      .from('invoices')
+      .select('paid_amount, shipping_fee, extra_fees')
+      .eq('id', id)
+      .single();
+
+    const shippingFee = updates.shipping_fee !== undefined ? (updates.shipping_fee || 0) : (currentInvoice?.shipping_fee || 0);
+    const extraFees = updates.extra_fees !== undefined ? (updates.extra_fees || 0) : (currentInvoice?.extra_fees || 0);
+
     // If items are being updated, recalculate totals
     if (updates.items) {
-      const { subtotal, taxTotal, discountTotal, total } = calculateTotals(
-        updates.items
+      const { subtotal, taxTotal, discountTotal, shippingFee: calcShipping, extraFees: calcExtra, total } = calculateTotals(
+        updates.items,
+        shippingFee,
+        extraFees
       );
-
-      // Get current paid amount
-      const { data: currentInvoice } = await supabase
-        .from('invoices')
-        .select('paid_amount')
-        .eq('id', id)
-        .single();
 
       const paidAmount = currentInvoice?.paid_amount || 0;
       const balance = total - paidAmount;
@@ -299,6 +328,8 @@ export async function updateInvoice(
           subtotal,
           tax_total: taxTotal,
           discount_total: discountTotal,
+          shipping_fee: calcShipping,
+          extra_fees: calcExtra,
           total,
           balance,
         })
@@ -339,13 +370,50 @@ export async function updateInvoice(
         if (itemsError) throw itemsError;
       }
     } else {
-      // Just update invoice fields
-      const { error } = await supabase
-        .from('invoices')
-        .update(updates)
-        .eq('id', id);
+      // Just update invoice fields, but recalculate total if shipping/extra fees changed
+      const { items: _, shipping_fee: updateShipping, extra_fees: updateExtra, ...otherUpdates } = updates;
+      
+      if (updateShipping !== undefined || updateExtra !== undefined) {
+        // Need to recalculate total with new shipping/extra fees
+        const { data: invoice } = await supabase
+          .from('invoices')
+          .select('subtotal, tax_total, discount_total')
+          .eq('id', id)
+          .single();
+        
+        if (invoice) {
+          const finalShipping = updateShipping !== undefined ? (updateShipping || 0) : shippingFee;
+          const finalExtra = updateExtra !== undefined ? (updateExtra || 0) : extraFees;
+          const newTotal = invoice.subtotal - invoice.discount_total + invoice.tax_total + finalShipping + finalExtra;
+          const { data: currentInvoice } = await supabase
+            .from('invoices')
+            .select('paid_amount')
+            .eq('id', id)
+            .single();
+          const balance = newTotal - (currentInvoice?.paid_amount || 0);
+          
+          const { error } = await supabase
+            .from('invoices')
+            .update({
+              ...otherUpdates,
+              shipping_fee: finalShipping,
+              extra_fees: finalExtra,
+              total: newTotal,
+              balance,
+            })
+            .eq('id', id);
+          
+          if (error) throw error;
+        }
+      } else {
+        // Just update other fields
+        const { error } = await supabase
+          .from('invoices')
+          .update(otherUpdates)
+          .eq('id', id);
 
-      if (error) throw error;
+        if (error) throw error;
+      }
     }
 
     // Update status based on dates and payments

@@ -25,6 +25,8 @@ export default function Settings() {
     default_tax_rate: 0,
     invoice_prefix: 'INV',
     default_payment_terms: 30,
+    auto_numbering: true,
+    next_invoice_number: 1,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -124,6 +126,8 @@ export default function Settings() {
           default_tax_rate: business.default_tax_rate || 0,
           invoice_prefix: business.invoice_prefix || 'INV',
           default_payment_terms: business.default_payment_terms || 30,
+          auto_numbering: business.auto_numbering !== undefined ? business.auto_numbering : true,
+          next_invoice_number: business.next_invoice_number || 1,
         });
         setBusiness(created);
         setIsNewBusiness(false);
@@ -321,6 +325,34 @@ export default function Settings() {
               </select>
             </div>
             <div>
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="checkbox"
+                  id="auto_numbering"
+                  checked={business.auto_numbering !== undefined ? business.auto_numbering : true}
+                  onChange={(e) => setBusiness({ ...business, auto_numbering: e.target.checked })}
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                />
+                <label htmlFor="auto_numbering" className="text-sm font-medium text-gray-700">
+                  Enable Auto-numbering
+                </label>
+              </div>
+              <p className="text-xs text-gray-500">Automatically generate sequential invoice numbers</p>
+            </div>
+            <div>
+              <Input
+                label="Next Invoice Number"
+                type="number"
+                value={business.next_invoice_number || 1}
+                onChange={(e) =>
+                  setBusiness({ ...business, next_invoice_number: parseInt(e.target.value) || 1 })
+                }
+                min="1"
+                disabled={!business.auto_numbering}
+              />
+              <p className="text-xs text-gray-500 mt-1">Starting number for auto-numbering</p>
+            </div>
+            <div>
               <Input
                 label="Default Tax Rate (%)"
                 type="number"
@@ -335,16 +367,24 @@ export default function Settings() {
               <p className="text-xs text-gray-500 mt-1">Default tax rate applied to new invoices</p>
             </div>
             <div>
-              <Input
-                label="Default Payment Terms (days)"
-                type="number"
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Default Due Date
+              </label>
+              <select
                 value={business.default_payment_terms || 30}
                 onChange={(e) =>
                   setBusiness({ ...business, default_payment_terms: parseInt(e.target.value) || 30 })
                 }
-                min="1"
-              />
-              <p className="text-xs text-gray-500 mt-1">Default number of days until payment is due</p>
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              >
+                <option value="7">Net 7 (7 days)</option>
+                <option value="15">Net 15 (15 days)</option>
+                <option value="30">Net 30 (30 days)</option>
+                <option value="45">Net 45 (45 days)</option>
+                <option value="60">Net 60 (60 days)</option>
+                <option value="90">Net 90 (90 days)</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Default payment terms for new invoices</p>
             </div>
           </div>
         </div>

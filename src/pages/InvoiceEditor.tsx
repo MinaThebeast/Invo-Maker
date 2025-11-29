@@ -5,9 +5,11 @@ import { useCustomers } from '../hooks/useCustomers';
 import { useProducts } from '../hooks/useProducts';
 import { useInvoice, useInvoices } from '../hooks/useInvoices';
 import { useBusiness } from '../hooks/useBusiness';
+import { useSubscription } from '../hooks/useSubscription';
 import { Invoice, InvoiceItem } from '../types';
 import Button from '../components/ui/Button';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { useToast, ToastContainer } from '../components/ui/ToastContainer';
 import BarcodeScanner from '../components/BarcodeScanner';
 import OCRScanner from '../components/OCRScanner';
 import AITextHelper from '../components/AITextHelper';
@@ -29,11 +31,14 @@ export default function InvoiceEditor() {
     due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     status: 'draft',
     currency: 'USD',
+    shipping_fee: 0,
+    extra_fees: 0,
   });
   const [items, setItems] = useState<Partial<InvoiceItem>[]>([]);
   const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
   const [showOCRScanner, setShowOCRScanner] = useState(false);
   const { toasts, success, error: showError, removeToast } = useToast();
+  const { checkAction } = useSubscription();
 
   useEffect(() => {
     if (business) {
@@ -51,12 +56,25 @@ export default function InvoiceEditor() {
 
   useEffect(() => {
     if (existingInvoice) {
-      setInvoice(existingInvoice);
+      setInvoice({
+        ...existingInvoice,
+        shipping_fee: existingInvoice.shipping_fee || 0,
+        extra_fees: existingInvoice.extra_fees || 0,
+      });
       setItems(existingInvoice.items || []);
     }
   }, [existingInvoice]);
 
   const handleSave = async (status: 'draft' | 'sent' = 'draft') => {
+    // Check subscription limits for new invoices only
+    if (!id) {
+      const canCreate = await checkAction('invoice');
+      if (!canCreate.allowed) {
+        showError(canCreate.reason || 'Invoice limit reached. Please upgrade your plan.');
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const invoiceData = {
@@ -67,6 +85,8 @@ export default function InvoiceEditor() {
         currency: invoice.currency || 'USD',
         notes: invoice.notes,
         terms: invoice.terms,
+        shipping_fee: invoice.shipping_fee || 0,
+        extra_fees: invoice.extra_fees || 0,
         items,
       };
 
@@ -354,13 +374,57 @@ export default function InvoiceEditor() {
               <div className="flex justify-between">
                 <dt className="text-sm text-gray-600">Subtotal</dt>
                 <dd className="text-sm font-medium">
-                  ${items.reduce((sum, item) => sum + (item.line_total || 0), 0).toFixed(2)}
+                  ${items.reduce((sum, item) => sum + ((item.quantity || 0) * (item.unit_price || 0)), 0).toFixed(2)}
                 </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-600">Discount</dt>
+                <dd className="text-sm font-medium text-red-600">
+                  -${items.reduce((sum, item) => sum + (item.discount || 0), 0).toFixed(2)}
+                </dd>
+              </div>
+              <div className="flex justify-between">
+                <dt className="text-sm text-gray-600">Tax</dt>
+                <dd className="text-sm font-medium">
+                  ${items.reduce((sum, item) => {
+                    const itemSubtotal = (item.quantity || 0) * (item.unit_price || 0) - (item.discount || 0);
+                    const itemTax = (itemSubtotal * (item.tax_rate || 0)) / 100;
+                    return sum + itemTax;
+                  }, 0).toFixed(2)}
+                </dd>
+              </div>
+              <div className="pt-2 border-t space-y-2">
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium text-gray-700">Shipping Fee</label>
+                  <input
+                    type="number"
+                    value={invoice.shipping_fee || 0}
+                    onChange={(e) => setInvoice({ ...invoice, shipping_fee: parseFloat(e.target.value) || 0 })}
+                    className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium text-gray-700">Extra Fees</label>
+                  <input
+                    type="number"
+                    value={invoice.extra_fees || 0}
+                    onChange={(e) => setInvoice({ ...invoice, extra_fees: parseFloat(e.target.value) || 0 })}
+                    className="w-24 px-2 py-1 border border-gray-300 rounded text-sm"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
               </div>
               <div className="flex justify-between pt-2 border-t">
                 <dt className="text-base font-semibold">Total</dt>
                 <dd className="text-base font-bold">
-                  ${items.reduce((sum, item) => sum + (item.line_total || 0), 0).toFixed(2)}
+                  ${(
+                    items.reduce((sum, item) => sum + (item.line_total || 0), 0) +
+                    (invoice.shipping_fee || 0) +
+                    (invoice.extra_fees || 0)
+                  ).toFixed(2)}
                 </dd>
               </div>
             </dl>
@@ -368,9 +432,9 @@ export default function InvoiceEditor() {
 
           {/* Notes and Terms */}
           <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
-            <div className="space-y-4">
-              <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Additional Information</h2>
+            <div className="space-y-6">
+              <div className="space-y-2">
                 <AITextHelper
                   type="notes"
                   value={invoice.notes || ''}
@@ -382,13 +446,13 @@ export default function InvoiceEditor() {
                   }}
                 />
                 <Textarea
-                  rows={3}
+                  rows={4}
                   value={invoice.notes || ''}
                   onChange={(e) => setInvoice({ ...invoice, notes: e.target.value })}
                   placeholder="Additional notes for the customer..."
                 />
               </div>
-              <div>
+              <div className="space-y-2">
                 <AITextHelper
                   type="terms"
                   value={invoice.terms || ''}
@@ -400,7 +464,7 @@ export default function InvoiceEditor() {
                   }}
                 />
                 <Textarea
-                  rows={3}
+                  rows={4}
                   value={invoice.terms || ''}
                   onChange={(e) => setInvoice({ ...invoice, terms: e.target.value })}
                   placeholder="Payment terms and conditions..."

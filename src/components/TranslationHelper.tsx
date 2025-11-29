@@ -49,34 +49,33 @@ export default function TranslationHelper({
   };
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-2">
-        <Languages className="w-4 h-4 text-gray-500" />
-        <span className="text-sm font-medium text-gray-700">Translate:</span>
-        <select
-          value={targetLanguage}
-          onChange={(e) => setTargetLanguage(e.target.value)}
-          className="text-sm px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500"
-          disabled={loading}
-        >
-          <option value="">Select language...</option>
-          {LANGUAGES.map((lang) => (
-            <option key={lang.code} value={lang.name}>
-              {lang.name}
-            </option>
-          ))}
-        </select>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={handleTranslate}
-          disabled={!targetLanguage || loading || !text.trim()}
-        >
-          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Translate'}
-        </Button>
-      </div>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+    <div className="flex items-center gap-2">
+      <Languages className="w-4 h-4 text-gray-500 flex-shrink-0" />
+      <span className="text-sm font-medium text-gray-700 whitespace-nowrap">Translate:</span>
+      <select
+        value={targetLanguage}
+        onChange={(e) => setTargetLanguage(e.target.value)}
+        className="text-sm px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-primary-500 focus:outline-none"
+        disabled={loading}
+      >
+        <option value="">Select language...</option>
+        {LANGUAGES.map((lang) => (
+          <option key={lang.code} value={lang.name}>
+            {lang.name}
+          </option>
+        ))}
+      </select>
+      <Button
+        type="button"
+        variant="ghost"
+        size="sm"
+        onClick={handleTranslate}
+        disabled={!targetLanguage || loading || !text.trim()}
+        className="text-xs whitespace-nowrap"
+      >
+        {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Translate'}
+      </Button>
+      {error && <p className="text-xs text-red-600 ml-2">{error}</p>}
     </div>
   );
 }

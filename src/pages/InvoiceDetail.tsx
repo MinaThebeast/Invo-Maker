@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Edit, Download, Mail, Plus, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Edit, Download, Mail, Plus, MessageSquare, Bell } from 'lucide-react';
 import { useInvoice } from '../hooks/useInvoices';
 import { usePayments } from '../hooks/usePayments';
 import { useBusiness } from '../hooks/useBusiness';
@@ -24,6 +24,7 @@ export default function InvoiceDetail() {
   const [downloadingPDF, setDownloadingPDF] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingSMS, setSendingSMS] = useState(false);
+  const [sendingReminder, setSendingReminder] = useState(false);
 
   const handleDownloadPDF = async () => {
     if (!invoice) return;
@@ -79,6 +80,59 @@ export default function InvoiceDetail() {
     }
   };
 
+  const handleSendReminder = async () => {
+    if (!invoice || !invoice.customer?.email) {
+      alert('Customer email is required to send reminder');
+      return;
+    }
+    setSendingReminder(true);
+    try {
+      const today = new Date();
+      const dueDate = new Date(invoice.due_date);
+      const daysOverdue = Math.floor((today.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      const subject = daysOverdue > 0 
+        ? `Reminder: Overdue Invoice ${invoice.invoice_number} - ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue`
+        : `Reminder: Invoice ${invoice.invoice_number} - Payment Due Soon`;
+      
+      const body = `Dear ${invoice.customer.name || 'Customer'},
+
+This is a friendly reminder regarding invoice #${invoice.invoice_number}.
+
+Invoice Details:
+- Invoice Number: ${invoice.invoice_number}
+- Issue Date: ${format(new Date(invoice.issue_date), 'MMM dd, yyyy')}
+- Due Date: ${format(new Date(invoice.due_date), 'MMM dd, yyyy')}
+- Total Amount: ${invoice.currency} ${invoice.total.toFixed(2)}
+${invoice.balance > 0 ? `- Balance Due: ${invoice.currency} ${invoice.balance.toFixed(2)}` : ''}
+${daysOverdue > 0 ? `\n⚠️ This invoice is ${daysOverdue} day${daysOverdue > 1 ? 's' : ''} overdue.` : ''}
+
+Please make payment at your earliest convenience. If you have already made payment, please disregard this reminder.
+
+Thank you for your business!
+
+Best regards,
+${business?.name || 'Your Business'}
+${business?.phone ? `\nPhone: ${business.phone}` : ''}
+${business?.email ? `\nEmail: ${business.email}` : ''}
+${business?.website ? `\nWebsite: ${business.website}` : ''}`;
+
+      // Try to use email service, fallback to mailto
+      try {
+        await sendInvoiceEmail(invoice, invoice.customer.email, subject, body);
+        alert('Reminder sent successfully!');
+      } catch (error) {
+        // Fallback to mailto
+        await sendInvoiceEmailFallback(invoice, invoice.customer.email, subject, body);
+      }
+    } catch (error) {
+      console.error('Error sending reminder:', error);
+      alert('Failed to send reminder');
+    } finally {
+      setSendingReminder(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -120,6 +174,15 @@ export default function InvoiceDetail() {
           <Button variant="outline" onClick={handleSendEmail} disabled={!invoice.customer?.email}>
             <Mail className="w-4 h-4 mr-2" />
             Send Email
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleSendReminder} 
+            disabled={!invoice.customer?.email || sendingReminder || invoice.balance <= 0}
+            title={invoice.balance <= 0 ? 'Invoice is fully paid' : 'Send payment reminder'}
+          >
+            <Bell className="w-4 h-4 mr-2" />
+            {sendingReminder ? 'Sending...' : 'Send Reminder'}
           </Button>
           <Button 
             variant="outline" 

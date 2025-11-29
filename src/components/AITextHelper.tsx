@@ -42,67 +42,69 @@ export default function AITextHelper({
   };
 
   return (
-    <div className="relative">
-      <div className="flex items-center justify-between mb-2">
-        <label className="block text-sm font-medium text-gray-700 capitalize">
+    <div className="relative mb-2">
+      <div className="flex items-start justify-between gap-4 mb-3">
+        <label className="block text-sm font-medium text-gray-700 capitalize flex-shrink-0 pt-1">
           {type}
         </label>
-        <div className="flex items-center gap-2">
-          <TranslationHelper
-            text={value}
-            onTranslated={onChange}
-          />
-          <div className="relative">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowToneOptions(!showToneOptions)}
-              disabled={loading}
-              className="text-xs"
-            >
-              {loading ? (
-                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-              ) : (
-                <Sparkles className="w-3 h-3 mr-1" />
-              )}
-              AI Assist
-            </Button>
-            {showToneOptions && (
-              <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2 min-w-[150px]">
-                <div className="text-xs font-medium text-gray-700 mb-2">Select tone:</div>
-                <div className="space-y-1">
-                  <button
-                    type="button"
-                    onClick={() => handleGenerate('polite')}
-                    className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
-                  >
-                    Polite
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleGenerate('professional')}
-                    className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
-                  >
-                    Professional
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleGenerate('firm')}
-                    className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
-                  >
-                    Firm
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleGenerate('friendly')}
-                    className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
-                  >
-                    Friendly
-                  </button>
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <TranslationHelper
+              text={value}
+              onTranslated={onChange}
+            />
+            <div className="relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowToneOptions(!showToneOptions)}
+                disabled={loading}
+                className="text-xs"
+              >
+                {loading ? (
+                  <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3 h-3 mr-1" />
+                )}
+                AI Assist
+              </Button>
+              {showToneOptions && (
+                <div className="absolute top-full right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 p-2 min-w-[150px]">
+                  <div className="text-xs font-medium text-gray-700 mb-2">Select tone:</div>
+                  <div className="space-y-1">
+                    <button
+                      type="button"
+                      onClick={() => handleGenerate('polite')}
+                      className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
+                    >
+                      Polite
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerate('professional')}
+                      className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
+                    >
+                      Professional
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerate('firm')}
+                      className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
+                    >
+                      Firm
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleGenerate('friendly')}
+                      className="block w-full text-left px-2 py-1 text-xs hover:bg-gray-100 rounded"
+                    >
+                      Friendly
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

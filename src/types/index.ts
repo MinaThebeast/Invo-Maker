@@ -25,6 +25,8 @@ export interface Business {
   default_tax_rate: number;
   invoice_prefix: string;
   default_payment_terms: number;
+  auto_numbering?: boolean;
+  next_invoice_number?: number;
   created_at: string;
   updated_at: string;
 }
@@ -82,6 +84,8 @@ export interface Invoice {
   subtotal: number;
   tax_total: number;
   discount_total: number;
+  shipping_fee?: number;
+  extra_fees?: number;
   total: number;
   paid_amount: number;
   balance: number;
