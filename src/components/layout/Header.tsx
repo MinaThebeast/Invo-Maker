@@ -1,4 +1,5 @@
 import { Menu, Bell, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,6 +10,33 @@ interface HeaderProps {
 export default function Header({ onMenuClick }: HeaderProps) {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [statusBarPadding, setStatusBarPadding] = useState(0);
+
+  useEffect(() => {
+    const calculateStatusBarPadding = async () => {
+      try {
+        const { Capacitor } = await import('@capacitor/core');
+        if (Capacitor.isNativePlatform()) {
+          if (Capacitor.getPlatform() === 'android') {
+            // Android: Status bar is typically 24dp (24px at mdpi)
+            // On modern devices, it can be 24-48px depending on density
+            // Use a fixed value that works for most devices
+            setStatusBarPadding(24); // Standard Android status bar height in pixels
+          } else {
+            // iOS: Use CSS env() variable, no JS padding needed
+            setStatusBarPadding(0);
+          }
+        } else {
+          setStatusBarPadding(0);
+        }
+      } catch (error) {
+        // Fallback for web or if Capacitor not available
+        setStatusBarPadding(0);
+      }
+    };
+
+    calculateStatusBarPadding();
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -16,7 +44,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-30 safe-area-top">
+    <header 
+      className="bg-white border-b border-gray-200 px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between sticky top-0 z-30 safe-area-top"
+      style={{
+        paddingTop: statusBarPadding > 0 
+          ? `calc(${statusBarPadding}px + 0.5rem)` 
+          : undefined
+      }}
+    >
       <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
         <button
           onClick={onMenuClick}

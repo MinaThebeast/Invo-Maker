@@ -40,16 +40,19 @@
   
   /* Safe area utilities for mobile */
   .safe-area-top {
-    /* Use env() with fallback - iOS safe area + base padding */
+    /* iOS: Use env() for safe area insets */
     padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
   }
   
-  /* For Android and devices without safe area, add minimum status bar height */
+  /* For iOS devices with safe area support */
   @supports (padding: env(safe-area-inset-top)) {
     .safe-area-top {
       padding-top: calc(env(safe-area-inset-top) + 0.5rem);
     }
   }
+  
+  /* Android fallback: minimum status bar height will be set via inline style */
+  /* This ensures Android gets proper padding even without env() support */
   
   .safe-area-bottom {
     padding-bottom: max(env(safe-area-inset-bottom), 0px);
