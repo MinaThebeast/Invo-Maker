@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.invomaker.app"
+    namespace "com.minaarian.invomaker"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.invomaker.app"
+        applicationId "com.minaarian.invomaker"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
