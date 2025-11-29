@@ -17,7 +17,7 @@ export const revenueCatConfig: RevenueCatConfig | null = revenueCatApiKey
 // RevenueCat REST API helper functions
 export async function getCustomerInfo(userId: string) {
   if (!revenueCatConfig) {
-    // Return default free tier if not configured
+    // Return default free tier if not configured (silently)
     return {
       subscriber: {
         entitlements: {
@@ -39,7 +39,7 @@ export async function getCustomerInfo(userId: string) {
     );
 
     if (!response.ok) {
-      // If user doesn't exist in RevenueCat, return free tier
+      // If user doesn't exist in RevenueCat, return free tier (silently)
       if (response.status === 404) {
         return {
           subscriber: {
@@ -49,13 +49,23 @@ export async function getCustomerInfo(userId: string) {
           },
         };
       }
-      throw new Error('Failed to fetch customer info');
+      // For other errors, return free tier silently (don't throw)
+      return {
+        subscriber: {
+          entitlements: {
+            active: {},
+          },
+        },
+      };
     }
 
     return response.json();
   } catch (error) {
-    console.error('Error fetching customer info:', error);
-    // Return free tier on error
+    // Only log errors in development and if RevenueCat is configured
+    if (import.meta.env.DEV && revenueCatConfig) {
+      console.warn('RevenueCat API error (defaulting to free tier):', error);
+    }
+    // Return free tier on error (silently)
     return {
       subscriber: {
         entitlements: {

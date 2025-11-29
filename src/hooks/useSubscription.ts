@@ -33,7 +33,20 @@ export function useSubscription() {
       setPlan(currentPlan);
       setUsage(currentUsage);
     } catch (error) {
-      console.error('Error loading subscription:', error);
+      // Silently default to free tier on error
+      // Only log in development
+      if (import.meta.env.DEV) {
+        console.warn('Subscription loading failed (defaulting to free):', error);
+      }
+      setTier('free');
+      setPlan(getPlanByTier('free'));
+      // Try to get usage stats anyway
+      try {
+        const currentUsage = await getUsageStats(user.id);
+        setUsage(currentUsage);
+      } catch {
+        setUsage(null);
+      }
     } finally {
       setLoading(false);
     }

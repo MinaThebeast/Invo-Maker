@@ -120,7 +120,11 @@ export async function getCurrentSubscription(userId: string): Promise<Subscripti
     
     return 'free';
   } catch (error) {
-    console.error('Error getting subscription:', error);
+    // Silently default to free tier on error
+    // Only log in development if RevenueCat is configured
+    if (import.meta.env.DEV && import.meta.env.VITE_REVENUECAT_API_KEY) {
+      console.warn('Subscription check failed (defaulting to free):', error);
+    }
     return 'free';
   }
 }
@@ -162,7 +166,11 @@ export async function getUsageStats(userId: string): Promise<UsageStats> {
       periodEnd: endOfMonth.toISOString(),
     };
   } catch (error) {
-    console.error('Error getting usage stats:', error);
+    // Silently return zero usage on error
+    // Only log in development
+    if (import.meta.env.DEV) {
+      console.warn('Usage stats error (defaulting to zero):', error);
+    }
     return {
       invoices: 0,
       aiSummaries: 0,
