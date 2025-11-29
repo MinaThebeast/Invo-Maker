@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { useAuth } from './hooks/useAuth';
+import { useRevenueCat } from './hooks/useRevenueCat';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -21,6 +22,9 @@ import LoadingSpinner from './components/ui/LoadingSpinner';
 
 function App() {
   const { user, loading } = useAuth();
+  
+  // Initialize RevenueCat (automatically identifies user after login)
+  useRevenueCat();
 
   // Initialize StatusBar for mobile
   useEffect(() => {
