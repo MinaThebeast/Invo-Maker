@@ -9,14 +9,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Initialize RevenueCat
-        // Get API key from Capacitor config or Info.plist
+        // Get API key from Info.plist
         if let revenueCatApiKey = Bundle.main.object(forInfoDictionaryKey: "RevenueCatAPIKey") as? String,
            !revenueCatApiKey.isEmpty {
+            // Configure RevenueCat with API key
             Purchases.configure(withAPIKey: revenueCatApiKey)
-            print("✅ RevenueCat initialized with API key")
+            
+            // Enable debug logs in development (optional)
+            #if DEBUG
+            Purchases.logLevel = .debug
+            #endif
+            
+            print("✅ RevenueCat initialized successfully")
+            print("📱 RevenueCat SDK Version: \(Purchases.frameworkVersion)")
         } else {
-            print("⚠️ Warning: RevenueCat API key not found. Please add RevenueCatAPIKey to Info.plist")
+            print("⚠️ Warning: RevenueCat API key not found in Info.plist")
+            print("   Please add RevenueCatAPIKey to Info.plist or run ./scripts/setup-revenuecat-keys.sh")
         }
+        
+        // Note: User ID will be set after user logs in via JavaScript
+        // See RevenueCatPlugin.swift for setting user ID from web app
         
         // Override point for customization after application launch.
         return true
