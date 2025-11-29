@@ -16,7 +16,6 @@ import InvoiceDetail from './pages/InvoiceDetail';
 import InvoiceEditor from './pages/InvoiceEditor';
 import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
-import Billing from './pages/Billing';
 import MainLayout from './components/layout/MainLayout';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 
@@ -82,7 +81,6 @@ function App() {
         <Route path="invoices/:id/edit" element={<InvoiceEditor />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="billing" element={<Billing />} />
       </Route>
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
     </Routes>

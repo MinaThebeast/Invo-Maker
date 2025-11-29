@@ -6,7 +6,6 @@ import {
   FileText,
   Settings,
   BarChart3,
-  CreditCard,
   X,
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
@@ -22,7 +21,6 @@ const navigation = [
   { name: 'Products', href: '/products', icon: Package },
   { name: 'Invoices', href: '/invoices', icon: FileText },
   { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Billing', href: '/billing', icon: CreditCard },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
