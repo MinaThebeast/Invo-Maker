@@ -88,24 +88,38 @@ export async function checkSubscriptionStatus(userId: string): Promise<boolean> 
   }
 }
 
+import { supabase } from './supabase';
+
 /**
  * Create a checkout session for a subscription
- * Note: This requires backend implementation or RevenueCat web SDK
+ * Uses Supabase Edge Function to create Stripe checkout session
  */
 export async function createCheckoutSession(
-  _userId: string,
-  _productId: string
-): Promise<string> {
-  if (!revenueCatConfig) {
-    throw new Error('RevenueCat not configured');
+  userId: string,
+  planId: string,
+  userEmail: string
+): Promise<{ url: string; sessionId: string }> {
+  const successUrl = `${window.location.origin}/settings?subscription=success&plan=${planId}`;
+  const cancelUrl = `${window.location.origin}/settings?subscription=cancelled`;
+
+  const { data, error } = await supabase.functions.invoke('create-checkout', {
+    body: {
+      userId,
+      planId,
+      userEmail,
+      successUrl,
+      cancelUrl,
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message || 'Failed to create checkout session');
   }
 
-  // This is a placeholder - you'll need to implement actual checkout
-  // Options:
-  // 1. Use RevenueCat's web SDK
-  // 2. Create a backend endpoint that handles RevenueCat API calls
-  // 3. Use Stripe directly and sync with RevenueCat
-  
-  throw new Error('Checkout not implemented. Please configure RevenueCat web integration.');
+  if (!data?.url) {
+    throw new Error('No checkout URL returned');
+  }
+
+  return { url: data.url, sessionId: data.sessionId };
 }
 

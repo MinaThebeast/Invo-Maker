@@ -28,13 +28,19 @@ export default function SubscriptionTab() {
     setProcessing(selectedPlan.tier);
 
     try {
-      alert(
-        `To subscribe to ${selectedPlan.name}, please configure RevenueCat web integration.\n\n` +
-        `Price: ${selectedPlan.price === 0 ? 'Free' : `$${selectedPlan.price.toFixed(2)}/month`}`
+      const { createCheckoutSession } = await import('../../lib/revenuecat');
+      
+      const { url } = await createCheckoutSession(
+        user.id,
+        selectedPlan.priceId,
+        user.email || ''
       );
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
     } catch (err: any) {
-      showError(err.message || 'Failed to process subscription');
-    } finally {
+      console.error('Checkout error:', err);
+      showError(err.message || 'Failed to create checkout session. Please ensure RevenueCat and Stripe are configured.');
       setProcessing(null);
     }
   };

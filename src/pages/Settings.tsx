@@ -1,14 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Settings as SettingsIcon, CreditCard, Receipt, HelpCircle } from 'lucide-react';
 import SettingsTab from '../components/settings/SettingsTab';
 import SubscriptionTab from '../components/settings/SubscriptionTab';
 import BillingHistoryTab from '../components/settings/BillingHistoryTab';
 import HelpTab from '../components/settings/HelpTab';
+import { useToast, ToastContainer } from '../components/ui/ToastContainer';
 
 type TabType = 'settings' | 'subscription' | 'billing' | 'help';
 
 export default function Settings() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabType>('settings');
+  const { toasts, success, error: showError, removeToast } = useToast();
+
+  // Handle subscription success/cancel from Stripe redirect
+  useEffect(() => {
+    const subscription = searchParams.get('subscription');
+    const plan = searchParams.get('plan');
+
+    if (subscription === 'success') {
+      success(`Successfully subscribed to ${plan || 'plan'}! Your subscription is now active.`);
+      setActiveTab('subscription');
+      // Clean up URL
+      setSearchParams({});
+    } else if (subscription === 'cancelled') {
+      showError('Subscription cancelled. No charges were made.');
+      setActiveTab('subscription');
+      // Clean up URL
+      setSearchParams({});
+    }
+  }, [searchParams, success, showError, setSearchParams]);
 
   const tabs = [
     { id: 'settings' as TabType, label: 'Settings', icon: SettingsIcon },
@@ -18,11 +40,13 @@ export default function Settings() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account and preferences</p>
-      </div>
+    <>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p className="text-gray-600 mt-1">Manage your account and preferences</p>
+        </div>
 
       {/* Tabs */}
       <div className="border-b border-gray-200">
@@ -63,5 +87,6 @@ export default function Settings() {
         {activeTab === 'help' && <HelpTab />}
       </div>
     </div>
+    </>
   );
 }
