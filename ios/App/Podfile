@@ -8,6 +8,9 @@ use_frameworks!
 # Requires CocoaPods 1.6 or newer
 install! 'cocoapods', :disable_input_output_paths => true
 
+# RevenueCat source
+source 'https://cdn.cocoapods.org/'
+
 def capacitor_pods
   pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
   pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
@@ -23,6 +26,8 @@ end
 target 'App' do
   capacitor_pods
   # Add your Pods here
+  # RevenueCat SDK (pod name is "Purchases" but import is "RevenueCat")
+  pod 'Purchases'
 end
 
 post_install do |installer|

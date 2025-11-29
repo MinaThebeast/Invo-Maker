@@ -45,5 +45,8 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- RevenueCat API Key - Replace with your actual API key from .env -->
+	<key>RevenueCatAPIKey</key>
+	<string>sk_lTdujSpKnpyIndLnlVaVdirrRuMNo</string>
 </dict>
 </plist>

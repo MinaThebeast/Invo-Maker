@@ -4,4 +4,6 @@
     <string name="title_activity_main">INVO Maker</string>
     <string name="package_name">com.minaarian.invomaker</string>
     <string name="custom_url_scheme">com.minaarian.invomaker</string>
+    <!-- RevenueCat API Key - Replace with your actual API key from .env -->
+    <string name="revenuecat_api_key">sk_lTdujSpKnpyIndLnlVaVdirrRuMNo</string>
 </resources>

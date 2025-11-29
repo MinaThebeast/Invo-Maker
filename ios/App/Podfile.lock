@@ -18,6 +18,9 @@ PODS:
   - CapacitorStatusBar (7.0.3):
     - Capacitor
   - IONFilesystemLib (1.0.1)
+  - Purchases (3.14.4):
+    - PurchasesCoreSwift (= 3.14.4)
+  - PurchasesCoreSwift (3.14.4)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -29,10 +32,13 @@ DEPENDENCIES:
   - "CapacitorNetwork (from `../../node_modules/@capacitor/network`)"
   - "CapacitorSplashScreen (from `../../node_modules/@capacitor/splash-screen`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
+  - Purchases
 
 SPEC REPOS:
   trunk:
     - IONFilesystemLib
+    - Purchases
+    - PurchasesCoreSwift
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -65,7 +71,9 @@ SPEC CHECKSUMS:
   CapacitorSplashScreen: e388b8e0ed0e982a9d3a40417f478e7a018a8763
   CapacitorStatusBar: 0659ddc7b1713764a05831463d215b177a15d054
   IONFilesystemLib: 89258b8e3e85465da93127d25d7ce37f977e8a6f
+  Purchases: 2c326c3a0a93445db8fe194d4938fc001e2cec1c
+  PurchasesCoreSwift: 00f41d415f3fb701a5c4bc9909bcbbcf1b1c4b05
 
-PODFILE CHECKSUM: d194226f7a11110e571e8f7c0a981221c63a7df1
+PODFILE CHECKSUM: 9f62505feb968111970902865f79f20c3c3ab623
 
 COCOAPODS: 1.16.2

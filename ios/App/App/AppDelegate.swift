@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import RevenueCat
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,6 +8,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Initialize RevenueCat
+        // Get API key from Capacitor config or Info.plist
+        if let revenueCatApiKey = Bundle.main.object(forInfoDictionaryKey: "RevenueCatAPIKey") as? String,
+           !revenueCatApiKey.isEmpty {
+            Purchases.configure(withAPIKey: revenueCatApiKey)
+            print("✅ RevenueCat initialized with API key")
+        } else {
+            print("⚠️ Warning: RevenueCat API key not found. Please add RevenueCatAPIKey to Info.plist")
+        }
+        
         // Override point for customization after application launch.
         return true
     }

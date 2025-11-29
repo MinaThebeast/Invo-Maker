@@ -1,17 +1,15 @@
-import { useState } from 'react';
 import { useSubscription } from '../../hooks/useSubscription';
 import { SUBSCRIPTION_PLANS, SubscriptionPlan } from '../../services/subscriptionService';
 import { useAuth } from '../../hooks/useAuth';
 import Button from '../ui/Button';
 import LoadingSpinner from '../ui/LoadingSpinner';
-import { Check, Crown, Zap, Sparkles, CreditCard, AlertCircle, Smartphone, AppWindow } from 'lucide-react';
+import { Check, Crown, Zap, Sparkles, AlertCircle, Smartphone } from 'lucide-react';
 import { useToast, ToastContainer } from '../ui/ToastContainer';
 
 export default function SubscriptionTab() {
   const { user } = useAuth();
   const { tier, plan, usage, loading, refresh } = useSubscription();
   const { success, error: showError, toasts, removeToast } = useToast();
-  const [processing, setProcessing] = useState<string | null>(null);
 
   const handleSubscribe = async (selectedPlan: SubscriptionPlan) => {
     if (!user) {
@@ -177,7 +175,6 @@ export default function SubscriptionTab() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SUBSCRIPTION_PLANS.map((subscriptionPlan) => {
               const isCurrentPlan = subscriptionPlan.tier === tier;
-              const isProcessing = processing === subscriptionPlan.tier;
 
               return (
                 <div
@@ -227,16 +224,11 @@ export default function SubscriptionTab() {
 
                   <Button
                     onClick={() => handleSubscribe(subscriptionPlan)}
-                    disabled={isCurrentPlan || isProcessing}
+                    disabled={isCurrentPlan}
                     className="w-full"
                     variant={isCurrentPlan ? 'outline' : 'primary'}
                   >
-                    {isProcessing ? (
-                      <>
-                        <LoadingSpinner />
-                        <span className="ml-2">Processing...</span>
-                      </>
-                    ) : isCurrentPlan ? (
+                    {isCurrentPlan ? (
                       'Current Plan'
                     ) : subscriptionPlan.price === 0 ? (
                       'Switch to Free'
