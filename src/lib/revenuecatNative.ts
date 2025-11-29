@@ -1,11 +1,15 @@
 /**
  * RevenueCat Native Integration
  * Functions to interact with RevenueCat SDK in native iOS/Android apps
+ * 
+ * Note: This requires the RevenueCat Capacitor plugin to be registered in native code.
+ * See ios/App/App/RevenueCatPlugin.swift for iOS implementation.
  */
 
-import { Capacitor } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
 
-interface RevenueCatPlugin {
+// Define plugin interface
+interface RevenueCatPluginInterface {
   identifyUser(options: { userId: string }): Promise<{ userId: string; created: boolean; entitlements: string[] }>;
   getOfferings(): Promise<{ packages: Array<{ identifier: string; productId: string; price: string; title: string; description: string }> }>;
   purchasePackage(options: { packageIdentifier: string }): Promise<{ success: boolean; entitlements: string[] }>;
@@ -14,29 +18,19 @@ interface RevenueCatPlugin {
 }
 
 // Register the plugin (will be available after native implementation)
+const RevenueCatPlugin = registerPlugin<RevenueCatPluginInterface>('RevenueCat', {
+  web: () => import('./revenuecatNative.web').then(m => new m.RevenueCatWeb()),
+});
+
+// Export convenience wrapper
 const RevenueCat = {
   /**
    * Identify user with Supabase user ID
    * Call this after user logs in
    */
   async identifyUser(userId: string) {
-    if (!Capacitor.isNativePlatform()) {
-      console.warn('RevenueCat identifyUser is only available on native platforms');
-      return { userId, created: false, entitlements: [] };
-    }
-
     try {
-      const plugin = (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android')
-        ? (await import('@capacitor/core')).Plugins as any
-        : null;
-
-      if (plugin?.RevenueCat) {
-        return await plugin.RevenueCat.identifyUser({ userId });
-      } else {
-        // Fallback: try direct plugin access
-        const { Plugins } = await import('@capacitor/core');
-        return await (Plugins as any).RevenueCat.identifyUser({ userId });
-      }
+      return await RevenueCatPlugin.identifyUser({ userId });
     } catch (error) {
       console.error('Error identifying RevenueCat user:', error);
       throw error;
@@ -47,13 +41,8 @@ const RevenueCat = {
    * Get available subscription packages
    */
   async getOfferings() {
-    if (!Capacitor.isNativePlatform()) {
-      return { packages: [] };
-    }
-
     try {
-      const { Plugins } = await import('@capacitor/core');
-      return await (Plugins as any).RevenueCat.getOfferings();
+      return await RevenueCatPlugin.getOfferings();
     } catch (error) {
       console.error('Error getting RevenueCat offerings:', error);
       throw error;
@@ -64,13 +53,8 @@ const RevenueCat = {
    * Purchase a subscription package
    */
   async purchasePackage(packageIdentifier: string) {
-    if (!Capacitor.isNativePlatform()) {
-      throw new Error('Purchases are only available on native platforms');
-    }
-
     try {
-      const { Plugins } = await import('@capacitor/core');
-      return await (Plugins as any).RevenueCat.purchasePackage({ packageIdentifier });
+      return await RevenueCatPlugin.purchasePackage({ packageIdentifier });
     } catch (error: any) {
       if (error.code === 'USER_CANCELLED') {
         throw new Error('User cancelled the purchase');
@@ -84,13 +68,8 @@ const RevenueCat = {
    * Get current customer info
    */
   async getCustomerInfo() {
-    if (!Capacitor.isNativePlatform()) {
-      return { userId: '', entitlements: [], activeSubscriptions: [], allPurchasedProductIdentifiers: [] };
-    }
-
     try {
-      const { Plugins } = await import('@capacitor/core');
-      return await (Plugins as any).RevenueCat.getCustomerInfo();
+      return await RevenueCatPlugin.getCustomerInfo();
     } catch (error) {
       console.error('Error getting customer info:', error);
       throw error;
@@ -101,13 +80,8 @@ const RevenueCat = {
    * Restore purchases
    */
   async restorePurchases() {
-    if (!Capacitor.isNativePlatform()) {
-      return { entitlements: [] };
-    }
-
     try {
-      const { Plugins } = await import('@capacitor/core');
-      return await (Plugins as any).RevenueCat.restorePurchases();
+      return await RevenueCatPlugin.restorePurchases();
     } catch (error) {
       console.error('Error restoring purchases:', error);
       throw error;
